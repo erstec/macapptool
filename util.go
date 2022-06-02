@@ -21,6 +21,8 @@ func verifySignature(p string) error {
 	args = append(args, "--ignore-cache", "--no-cache")
 	if strings.ToLower(filepath.Ext(p)) == ".app" {
 		args = append(args, "--type", "execute")
+	} else if strings.ToLower(filepath.Ext(p)) == ".dmg" {
+		args = append(args, "--type", "install")
 	} else {
 		args = append(args, "--type", "open", "--context", "context:primary-signature")
 	}

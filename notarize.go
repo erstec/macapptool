@@ -136,9 +136,18 @@ func stapleAndVerify(zipFile string) error {
 		return err
 	}
 	defer os.RemoveAll(dir)
-	p, canStaple, err := unzipPayload(zipFile, dir)
-	if err != nil {
-		return err
+
+	var canStaple bool
+	var p string
+
+	if filepath.Ext(zipFile) == ".zip" {
+		p, canStaple, err = unzipPayload(zipFile, dir)
+		if err != nil {
+			return err
+		}
+	} else { // for ex. .dmg
+		p = zipFile
+		canStaple = true
 	}
 
 	if canStaple {
@@ -151,7 +160,7 @@ func stapleAndVerify(zipFile string) error {
 		return err
 	}
 
-	if canStaple {
+	if canStaple && filepath.Ext(zipFile) == ".zip" {
 		newZipPath, err := makeAppZip(p)
 		if err != nil {
 			return err
@@ -174,6 +183,8 @@ func findPrimaryBundleID(payload string) (string, error) {
 
 		}
 		pr = newZipPayloadReader(zr)
+	case ".dmg":
+		pr = newZipPayloadReader(payload)
 	default:
 		return "", fmt.Errorf("can't read payload with extension %q", filepath.Ext(payload))
 	}
@@ -191,7 +202,7 @@ func findPrimaryBundleID(payload string) (string, error) {
 		count++
 		parts := strings.Split(filename, "/")
 		if len(parts) == 3 &&
-			filepath.Ext(parts[0]) == ".app" &&
+			(filepath.Ext(parts[0]) == ".app" || filepath.Ext(parts[0]) == ".dmg") &&
 			parts[1] == "Contents" &&
 			parts[2] == "Info.plist" {
 
@@ -383,6 +394,8 @@ func notarizeFile(req notarizationRequest) error {
 	switch ext {
 	case ".zip":
 		return notarizePayload(req)
+	case ".dmg":
+		return notarizePayload(req)
 	case ".app", "":
 		appZip, err := makeAppZip(req.AppPath)
 		if err != nil {
@@ -473,5 +486,6 @@ func (c *notarizeCmd) notarizeApp(p string) error {
 		Password: c.Password,
 		UUID:     c.UUID,
 	}
+	errPrintf("notarizing %s\n", p)
 	return notarizeFile(req)
 }
