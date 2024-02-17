@@ -19,7 +19,7 @@ func main() {
 	subcommands.Register(subcommands.CommandsCommand(), "")
 	subcommands.Register(&fixCmd{}, "")
 	subcommands.Register(&signCmd{}, "")
-	subcommands.Register(&notarizeCmd{}, "")
+	subcommands.Register(&stapleCmd{}, "")
 	subcommands.Register(&zipCmd{}, "")
 
 	flag.Parse()
