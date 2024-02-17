@@ -24,6 +24,8 @@ jobs:
           echo "::set-env name=GOPROXY::https://proxy.golang.org"
           echo "::add-path::$(dirname $GITHUB_WORKSPACE)/bin"
         shell: bash
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       - name: Checkout Code
         uses: actions/checkout@v1
