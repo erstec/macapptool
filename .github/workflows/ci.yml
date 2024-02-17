@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go: [1.11, 1.12, 1.13]
+        go: [1.11, 1.12, 1.22]
     name: ${{ matrix.os }} @ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -24,6 +24,8 @@ jobs:
           echo "::set-env name=GOPROXY::https://proxy.golang.org"
           echo "::add-path::$(dirname $GITHUB_WORKSPACE)/bin"
         shell: bash
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       - name: Checkout Code
         uses: actions/checkout@v1
@@ -31,7 +33,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: GOFMT Check
-        if: matrix.go == 1.13 && matrix.os == 'ubuntu-latest'
+        if: matrix.go == 1.22 && matrix.os == 'ubuntu-latest'
         run: test -z $(gofmt -l .)
 
       - name: Run Tests
