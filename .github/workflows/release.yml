@@ -65,5 +65,4 @@ jobs:
           file: ${{ env.ASSET_NAME }}
           asset_name: ${{ env.ASSET_NAME }}
           overwrite: true
-          prerelease: true
           tag: ${{ github.ref }}
